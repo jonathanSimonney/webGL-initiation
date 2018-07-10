@@ -1,4 +1,4 @@
-var camera, scene, renderer, stats, controls;
+var camera, scene, renderer, stats, controls, light;
 
 var cube, sphere, cylindre, prisme, cami;
 init();
@@ -8,6 +8,11 @@ animate();
 //initializers BEGIN
 
 //helper
+
+function initLight(){
+    light = new THREE.DirectionalLight( 0xffffff, 1 );
+    scene.add( light );
+}
 function initStats(){
     stats = new Stats();
     stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -48,6 +53,7 @@ function init() {
     initCamera();
     initControls();
     initScene();
+    initLight();
     initRenderer();
 
     window.addEventListener( 'resize', onWindowResize, false );
@@ -65,25 +71,70 @@ function onWindowResize() {
 
 //addition of objects in the scene.
 
-function getSingleObject(texture, geometryBuffer){
-    var material = new THREE.MeshBasicMaterial( { map: texture } );
+function getSingleObject(textureOrColor, geometryBuffer, isColor = false){
+    var material;
+    if (isColor){
+        material = new THREE.MeshPhongMaterial( { color: textureOrColor, shininess: 0.07} );
+    }else{
+        material = new THREE.MeshBasicMaterial( { map: textureOrColor } );
+    }
     return new THREE.Mesh( geometryBuffer, material );
 }
 
-function setObjectsInScene(){
+function createCube(){
     var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
     var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-    //this before
-    cube = getSingleObject(texture, geometry);
+
+    return getSingleObject(texture, geometry, false);
+}
+
+function createSphere(){
+    var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
+    var geometry = new THREE.SphereGeometry( 10, 32, 32);
+
+    var ret = getSingleObject(texture, geometry, false);
+    ret.position.x = -700;
+    return ret;
+}
+
+function createCylinder(){
+    var color = "#ff0000";
+    var geometry = new THREE.CylinderGeometry( 150, 150, 200 );
+
+    var ret = getSingleObject(color, geometry, true);
+    ret.position.x = -300;
+    return ret;
+}
+
+function createPrism(){
+    var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
+    var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+
+    return getSingleObject(texture, geometry);
+}
+
+function setObjectsInScene(){
+    cube = createCube();
+    cylindre = createCylinder();
+    sphere = createSphere();
 
     scene.add( cube );
+    scene.add( cylindre );
+    scene.add( sphere );
+}
+
+function executeRotation(object){
+    object.rotation.x += 0.005;
+    object.rotation.y += 0.01;
 }
 
 function animate() {
     requestAnimationFrame( animate );
-    cube.rotation.x += 0.005;
-    cube.rotation.y += 0.01;
+    executeRotation(cube);
+    executeRotation(cylindre);
+    executeRotation(sphere);
     controls.update();
+    light.position.setFromMatrixPosition( camera.matrixWorld );
     renderer.render( scene, camera );
     stats.update();
 }
