@@ -1,6 +1,6 @@
 var camera, scene, renderer, stats, controls, light;
 
-var cube, sphere, cylindre, prisme, cami;
+var cube, sphere, cylindre, ring, cami;
 init();
 setObjectsInScene();
 animate();
@@ -106,21 +106,27 @@ function createCylinder(){
     return ret;
 }
 
-function createPrism(){
+function createRing(){
     var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
-    var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+    var geometry = new THREE.TorusBufferGeometry( 15, 4, 80, 160 );
 
-    return getSingleObject(texture, geometry);
+    ret =  getSingleObject(texture, geometry, false);
+
+    ret.position.x = 200;
+
+    return ret;
 }
 
 function setObjectsInScene(){
     cube = createCube();
     cylindre = createCylinder();
     sphere = createSphere();
+    ring = createRing();
 
     scene.add( cube );
     scene.add( cylindre );
     scene.add( sphere );
+    scene.add(ring);
 }
 
 function executeRotation(object){
@@ -133,6 +139,7 @@ function animate() {
     executeRotation(cube);
     executeRotation(cylindre);
     executeRotation(sphere);
+    executeRotation(ring);
     controls.update();
     light.position.setFromMatrixPosition( camera.matrixWorld );
     renderer.render( scene, camera );
