@@ -9,6 +9,21 @@ animate();
 
 //helper
 
+function initSound(){
+    var listener = new THREE.AudioListener();
+    camera.add( listener );
+
+    var sound = new THREE.Audio( listener );
+
+    var audioLoader = new THREE.AudioLoader();
+    audioLoader.load( 'assets/music/GROS-SON.mp3', function( buffer ) {
+        sound.setBuffer( buffer );
+        sound.setLoop( true );
+        sound.setVolume( 0.5 );
+        sound.play();
+    });
+}
+
 function initLight(){
     light = new THREE.DirectionalLight( 0xffffff, 1 );
     scene.add( light );
@@ -51,6 +66,7 @@ function initRenderer(){
 function init() {
     initStats();
     initCamera();
+    initSound();
     initControls();
     initScene();
     initLight();
@@ -117,11 +133,27 @@ function createRing(){
     return ret;
 }
 
+function loadTruck(){
+    var loader = new THREE.STLLoader();
+    //loader.setPath( 'assets/textures/' );
+    loader.load( 'assets/model/toy-truck10-v2a.stl', function ( geometry ) {
+        var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+        cami = new THREE.Mesh( geometry, material );
+        cami.position.x = 300;
+        cami.scale.set( 2, 2, 2 );
+        cami.castShadow = true;
+        cami.receiveShadow = true;
+        scene.add( cami );
+    });
+
+}
+
 function setObjectsInScene(){
     cube = createCube();
     cylindre = createCylinder();
     sphere = createSphere();
     ring = createRing();
+    loadTruck();
 
     scene.add( cube );
     scene.add( cylindre );
@@ -140,6 +172,9 @@ function animate() {
     executeRotation(cylindre);
     executeRotation(sphere);
     executeRotation(ring);
+    if (cami !== undefined){
+        executeRotation(cami);
+    }
     controls.update();
     light.position.setFromMatrixPosition( camera.matrixWorld );
     renderer.render( scene, camera );
