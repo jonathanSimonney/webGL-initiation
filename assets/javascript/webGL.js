@@ -1,4 +1,6 @@
 var camera, scene, renderer, stats, controls;
+
+var cube, sphere, cylindre, prisme, cami;
 init();
 setObjectsInScene();
 animate();
@@ -72,15 +74,15 @@ function setObjectsInScene(){
     var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
     var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
     //this before
-    var cube = getSingleObject(texture, geometry);
+    cube = getSingleObject(texture, geometry);
 
     scene.add( cube );
 }
 
 function animate() {
     requestAnimationFrame( animate );
-    // mesh.rotation.x += 0.005;
-    // mesh.rotation.y += 0.01;
+    cube.rotation.x += 0.005;
+    cube.rotation.y += 0.01;
     controls.update();
     renderer.render( scene, camera );
     stats.update();
