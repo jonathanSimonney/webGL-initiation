@@ -1,1 +1,3 @@
 # webGL-initiation
+
+- npm install 
